@@ -1,0 +1,80 @@
+---
+title: "R Bridge Course Final Project"
+author: "MiaC"
+date: "January 10, 2019"
+output: html_document
+---
+## Question for analysis: 
+### Which has greater influence on students' first year GPA in college? High school GPA or SAT score?
+```{r}
+# Read FirstYearGPA.csv from github
+gpa <- read.csv("https://raw.githubusercontent.com/miachen410/FirstYearGPA/master/FirstYearGPA.csv")
+```
+## 1. Data Exploration
+```{r}
+# Explore the dataset by looking at the first few rows
+head(gpa)
+
+# Identify the types of variables
+str(gpa)
+
+# Generate a summary statistics including means, medians, quartiles, minimum and maximum
+summary(gpa)
+```
+All variables are integer or numeric.
+The average GPA is 3.096 and median GPA is 3.150.
+The average High School GPA is 3.453, median GPA is 3.5.
+Percentage of male is 46.58%.
+Percentage of first generation college student is 11.42%.
+
+```{r}
+# Count numbers of male versus female students
+table(gpa$Male)
+```
+There are 102 male students and 117 female students.
+
+### 2. Data wrangling
+```{r}
+library(dplyr)
+```
+```{r}
+# Add a new column called SAT, which combines SATV and SATM
+gpa <- mutate(gpa, SAT = SATV + SATM)
+
+# Filter male students
+# Display only variables X, GPA, HSGPA, SAT, FirstGen, White
+# Assign to new data frame males
+males <- gpa %>% filter(Male == 1) %>% select(X, GPA, HSGPA, SAT, FirstGen, White)
+
+# Show first 6 rows of males
+head(males)
+```
+
+### 3. Graphics
+```{r}
+# Scatter Plot to show relationship between HSGPA and GPA in males
+plot(males$HSGPA, males$GPA, main = "High School GPA v.s. First Year College GPA of Males", xlab = "High School GPA", ylab = "College GPA")
+```
+```{r}
+# Histogram to show the distribution of GPA distribution among males
+hist(males$GPA, main = "First Year College GPA Distribution among Males", xlab = "GPA")
+```
+```{r}
+boxplot(GPA~Male, data = gpa, names = c("Female", "Male"), main = "First Year College GPA of Females and Males")
+```
+```{r}
+library(ggplot2)
+```
+```{r}
+# Scatter plot from ggplot2 package, showing relationship between SAT and college GPA for male representing by blue dots, and female representing by black dots
+a <- ggplot(gpa, aes(x=SAT, y=GPA, color=Male)) + geom_point() + ggtitle("SAT v.s. College GPA for Male and Female")
+a
+```
+
+```{r}
+b <- ggplot(gpa, aes(x=HSGPA, y=GPA, color=Male)) + geom_point() + ggtitle("High School GPA v.s. College GPA for Male and Female")
+b
+```
+
+## Observation:
+### High school GPA seems to be more correlated with first year college GPA than SAT score.
